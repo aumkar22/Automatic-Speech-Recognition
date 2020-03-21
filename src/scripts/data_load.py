@@ -4,16 +4,15 @@ import numpy as np
 from typing import List, Tuple
 from scipy.io import wavfile
 
-from src.definitions import *
-
+from src.util.definitions import *
 
 # Loading test and validation file names in pandas dataframe
-test_files = pd.read_csv((DATA_FOLDER / "data_info" / "testing_list.txt"), sep=" ", header=None)[
-    0
-].tolist()
-val_files = pd.read_csv((DATA_FOLDER / "data_info" / "validation_list.txt"), sep=" ", header=None)[
-    0
-].tolist()
+test_files = pd.read_csv(
+    str(DATA_FOLDER + "/" + "data_info" + "/" + "testing_list.txt"), sep=" ", header=None
+)[0].tolist()
+val_files = pd.read_csv(
+    str(DATA_FOLDER + "/" + "data_info" + "/" + "validation_list.txt"), sep=" ", header=None
+)[0].tolist()
 
 
 def get_test_val_labels_list(dataset: pd.DataFrame) -> Tuple[List[str], List[str]]:
