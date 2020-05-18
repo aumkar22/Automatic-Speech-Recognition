@@ -1,7 +1,7 @@
-import keras
+import tensorflow.keras as tf
 
 from abc import ABC, abstractmethod
-from typing import List, Generator
+from typing import List
 
 
 class NnModel(ABC):
@@ -11,7 +11,7 @@ class NnModel(ABC):
     in this project should inherit this class for a consistent interface
     """
 
-    def __init__(self, features: int, channels: int, out: int, batchsize: int):
+    def __init__(self, features: int = 98, channels: int = 40, out: int = 35):
 
         """
         Initialize the model with hyperparameters
@@ -19,16 +19,14 @@ class NnModel(ABC):
         :param features: Features dimension (Time)
         :param channels: MFCC coefficients
         :param out: Number of classes
-        :param batchsize: Training batch size
         """
 
         self.features = features
         self.channels = channels
         self.out = out
-        self.batchsize = batchsize
 
     @abstractmethod
-    def model_architecture(self) -> keras.Model:
+    def model_architecture(self) -> tf.Model:
 
         """"
         Function to build model architecture
@@ -36,7 +34,14 @@ class NnModel(ABC):
         pass
 
     @abstractmethod
-    def model_compile(self) -> keras.Model:
+    def model_compile(
+        self,
+        model: tf.Model,
+        learning_rate: float = 1e-4,
+        beta1: float = 0.9,
+        beta2: float = 0.999,
+        epsilon: float = 1e-8,
+    ) -> tf.Model:
 
         """
         Function to compile the model
@@ -45,33 +50,12 @@ class NnModel(ABC):
         """
         pass
 
-    @abstractmethod
-    def batch_generator(self) -> Generator:
-
-        """
-        Function for batch generator
-
-        :return: Yields batches of data and labels
-        """
-        pass
-
-    @abstractmethod
-    def step_decay(self, epoch: int) -> float:
-
-        """
-        Step decay function for learning rate scheduling during training
-
-        :param epoch: Epoch number for step decay
-        :return: Decayed learning rate
-        """
-        pass
-
-    @abstractmethod
-    def model_callbacks(self) -> List[keras.callbacks]:
-
-        """
-        Function for adding model callbacks
-
-        :return: List of callbacks
-        """
-        pass
+    # @abstractmethod
+    # def model_callbacks(self) -> List[tf.callbacks]:
+    #
+    #     """
+    #     Function for adding model callbacks
+    #
+    #     :return: List of callbacks
+    #     """
+    #     pass

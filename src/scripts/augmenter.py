@@ -1,59 +1,128 @@
 import numpy as np
+import random
+from abc import ABC, abstractmethod
+from typing import List
 
 
-def scaling(signal: np.ndarray, scale_factor: float = 0.1, mean: float = 1.0) -> np.ndarray:
-
+class Augmentation(ABC):
     """
-    Function to perform scaling augmentation
-
-    :param signal: Input original signal
-    :param scale_factor: Standard deviation of the noise
-    :param mean: Mean of the noise
-    :return: Scaled signal array
+    Base class for data augmentations. Other augmentations should extend this class to make sure
+    that the interface for augmentations is consistent.
     """
 
-    signal_reshaped = np.reshape(signal, (signal.shape[0], 1))
+    @abstractmethod
+    def augment(self, features: np.ndarray) -> np.ndarray:
+        """
+        Augment the sensor data
 
-    noise = np.random.normal(loc=mean, scale=scale_factor, size=(1, signal_reshaped.shape[1]))
-    scaling_noise = np.matmul(np.ones((signal_reshaped.shape[0], 1)), noise)
-
-    signal_scaled = signal_reshaped * scaling_noise
-
-    return np.array([i for i in np.reshape(signal_scaled, (signal_scaled.shape[0]))])
+        :param features: Data that should be augmented.
+        :return: Augmented data
+        """
+        pass
 
 
-def jitter(signal: np.ndarray, sigma: float = 0.05, mean: float = 0.0) -> np.ndarray:
+class JitterAugmentation(Augmentation):
+    def __init__(self, mean=0.0, std=0.05):
+        """
+        Initialize the object using the mean and std which will be used to pull random numbers from
+        a normal distribution.
 
+        :param mean:
+        :param std:
+        """
+        self._mean = mean
+        self._std = std
+
+    def augment(self, features: np.ndarray) -> np.ndarray:
+        """
+        Apply noise to the input data based on the mean and standard deviation used to initialize
+        this augmentation.
+
+        :param features:
+        :return:
+        """
+        return features + np.random.normal(loc=self._mean, scale=self._std, size=features.shape)
+
+
+class ScalingAugmentation(Augmentation):
+    def __init__(self, mean=1.0, std=0.1):
+        """
+        Initialize the object using the mean and std which will be used to pull random numbers from
+        a normal distribution.
+
+        :param mean:
+        :param std:
+        """
+        self._mean = mean
+        self._std = std
+
+    def augment(self, features: np.ndarray) -> np.ndarray:
+        """
+        Apply a small change in scale to the provided data based on the mean and standard deviation
+        that were used to initialize this class.
+
+        :param features:
+        :return:
+        """
+        scaling_factor = np.random.normal(
+            loc=self._mean, scale=self._std, size=(1, features.shape[1])
+        )
+        return features * scaling_factor
+
+
+class TimeShiftAugmentation(Augmentation):
+    def __init__(self, max_shift: float = 0.2):
+        """
+
+        :param max_shift:
+        """
+
+        self.max_shift = max_shift
+
+    # Function taken from https://github.com/PJansson/speech/blob/master/utils/data.py
+    def augment(self, features: np.ndarray) -> np.ndarray:
+
+        """
+
+        :param features:
+        :return:
+        """
+        shift = np.random.uniform(-self.max_shift, self.max_shift)
+        shift = int(len(features) * shift)
+        if shift > 0:
+            padded = np.pad(features, (shift, 0), "constant")
+            return np.array(padded[: len(features)])
+        else:
+            padded = np.pad(features, (0, -shift), "constant")
+            return np.array(padded[-len(features) :])
+
+
+class NoChangeAugmentation(Augmentation):
+    def augment(self, features: np.ndarray) -> np.ndarray:
+        """
+        Return the input data without any change. The idea behind this is that you can create a
+        list of possible augmentations, while also being able to not augment data.
+
+        :param features:
+        :return:
+        """
+        return features
+
+
+def apply_augmentations(data: np.ndarray, augmentations: List[Augmentation]) -> np.ndarray:
     """
-    Function to perform jitter augmentation
+    Iterate over experiments in the data and per experiment apply a random augmentation from the
+    augmentations provided.
 
-    :param signal: Input original signal
-    :param sigma: Standard deviation of the noise
-    :param mean: Mean of the noise
-    :return: Signal with additive noise
+    :param data: Data in the shape of (experiments, samples, channels) that will be augmented.
+    :param augmentations: List of augmentations from which one will be picked to apply per
+                          experiment.
+    :return: Data where a random augmentation is applied per experiment.
     """
-
-    noise = np.random.normal(loc=mean, scale=sigma, size=signal.shape)
-
-    return np.array([i for i in (signal + noise)])
-
-
-# Function taken from https://github.com/PJansson/speech/blob/master/utils/data.py
-def timeshift(signal: np.ndarray, max_shift: float = 0.2) -> np.ndarray:
-
-    """
-    Function to shift audio in time.
-
-    :param signal: Input original signal
-    :param max_shift: Shift bound
-    :return: Time shifted signal
-    """
-
-    shift = np.random.uniform(-max_shift, max_shift)
-    shift = int(len(signal) * shift)
-    if shift > 0:
-        padded = np.pad(signal, (shift, 0), "constant")
-        return np.array(padded[: len(signal)])
-    else:
-        padded = np.pad(signal, (0, -shift), "constant")
-        return np.array(padded[-len(signal) :])
+    # There are different ways to do this, including creating a list of augmented experiments and
+    # stacking these, however this approach is about 10% faster. Ideally we'd use another approach
+    # and do away with the for loop entirely, but we haven't found a suitable solution yet.
+    augmented_data = np.empty(data.shape)
+    for i, experiment in enumerate(data):
+        augmented_data[i] = random.choice(augmentations).augment(experiment)
+    return augmented_data
