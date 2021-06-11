@@ -21,7 +21,6 @@ class Mfcc(Layer):
         self.sampling_frequency = 16000
         self.hop_length = int(self.sampling_frequency / 100)
         self.n_fft = 40
-        self.fft_len = 512
         self.lower_edge_hertz, self.upper_edge_hertz, self.num_mel_bins = 80.0, 7600.0, 40
 
     def call(self, input_sig, fft_len=512):
