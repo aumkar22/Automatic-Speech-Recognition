@@ -1,6 +1,5 @@
 import tensorflow.keras as tf
 
-from typing import Tuple
 from tensorflow.keras.layers import (
     Conv2D,
     Dense,
@@ -14,22 +13,23 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 
 from src.models.nn_models import NnModel
+from src.models.mfcc_layer import Mfcc
 
 
 class Cnn1Param100k(NnModel):
     def __init__(
         self,
-        N1: int = 64,
-        N2: int = 1,
-        kernel_size1: Tuple[int, int] = (1, 4),
-        strides1: Tuple[int, int] = (1, 2),
-        pool_size1: int = 2,
-        pool_stride1: int = 1,
-        kernel_size2: Tuple[int, int] = (1, 4),
-        strides2: Tuple[int, int] = (1, 2),
-        pool_size2: int = 2,
-        pool_stride2: int = 1,
-        Nfc: int = 60,
+        N1,
+        N2,
+        kernel_size1,
+        strides1,
+        pool_size1,
+        pool_stride1,
+        kernel_size2,
+        strides2,
+        pool_size2,
+        pool_stride2,
+        Nfc,
     ):
 
         """
@@ -59,7 +59,7 @@ class Cnn1Param100k(NnModel):
         self.pool_stride2 = pool_stride2
         self.Nfc = Nfc
         super().__init__()
-        self.input_shape = (self.features, self.channels, 1)
+        self.input_shape = (self.features,)
 
     def model_architecture(self) -> tf.Model:
 
@@ -70,9 +70,11 @@ class Cnn1Param100k(NnModel):
 
         model_input = Input(shape=self.input_shape)
 
+        model = Mfcc(trainable=False)(model_input)
+
         model = Conv2D(
             self.N1, kernel_size=self.kernel_size1, strides=self.strides1, activation="relu"
-        )(model_input)
+        )(model)
 
         model = BatchNormalization(axis=-1, scale=None)(model)
 
