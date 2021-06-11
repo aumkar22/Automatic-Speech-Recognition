@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 
 from typing import List, Tuple
@@ -6,26 +5,18 @@ from scipy.io import wavfile
 
 from src.util.definitions import *
 
-# Loading test and validation file names in pandas dataframe
-test_files = pd.read_csv(
-    str(DATA_FOLDER + "/" + "data_info" + "/" + "testing_list.txt"), sep=" ", header=None
-)[0].tolist()
-val_files = pd.read_csv(
-    str(DATA_FOLDER + "/" + "data_info" + "/" + "validation_list.txt"), sep=" ", header=None
-)[0].tolist()
 
-
-def get_test_val_labels_list(dataset: pd.DataFrame) -> Tuple[List[str], List[str]]:
+def get_test_val_labels_list(dataset: List[str]) -> Tuple[List[str], List[str]]:
 
     """
     Function to return test or validation file paths and labels
 
-    :param dataset: Test or validation dataframe
+    :param dataset: List of test or validation data wav
     :return: Lists of test or validation file paths and corresponding labels
     """
 
-    label = [os.path.dirname(i) for i in dataset]
-    data_files = [os.path.join(DATA_PATH, f) for f in dataset if f.endswith(".wav")]
+    label = [str(Path(i).parent) for i in dataset]
+    data_files = [str(Path(DATA_PATH / f)) for f in dataset if f.endswith(".wav")]
 
     return data_files, label
 
@@ -42,12 +33,10 @@ def train_data_labels_list(
     :return: Lists of training file paths and corresponding labels
     """
 
-    data_list = []
-    for root, dirs, files in os.walk(DATA_PATH):
-        data_list += [root + "/" + f for f in files if f.endswith(".wav")]
+    data_list = [str(i) for i in DATA_PATH.glob(r"**/*.wav")]
 
     train_list = list(set(data_list) - set(test_list) - set(val_list))
-    train_lab = [os.path.basename(os.path.dirname(i)) for i in train_list]
+    train_lab = [str(Path(i).parent.stem) for i in train_list]
 
     return train_list, train_lab
 
