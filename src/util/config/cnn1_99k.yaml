@@ -1,0 +1,17 @@
+default:
+  N1: 128
+  N2: 1
+  kernel_size1: (1, 4)
+  strides1: (1, 2)
+  pool_size1: 2
+  pool_stride1: 1
+  kernel_size2: (1, 2)
+  strides2: (1, 2)
+  pool_size2: 2
+  pool_stride2: 1
+  Nfc1: 60
+  Nfc2: 240
+  Nfc3: 120
+  dropout1: 0.3
+  dropout2: 0.3
+  dropout3: 0.3

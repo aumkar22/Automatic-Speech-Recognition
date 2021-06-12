@@ -1,0 +1,13 @@
+default:
+  N1: 64
+  N2: 1
+  kernel_size1: (1, 4)
+  strides1: (1, 2)
+  pool_size1: 2
+  pool_stride1: 1
+  kernel_size2: (1, 4)
+  strides2: (1, 2)
+  pool_size2: 2
+  pool_stride2: 1
+  Nfc1: 120
+  Nfc2: 240
