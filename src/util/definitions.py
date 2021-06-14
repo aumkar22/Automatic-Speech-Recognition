@@ -7,6 +7,8 @@ DATA_FOLDER: Path = PROJECT_PATH / "data"
 DATA_PATH: Path = DATA_FOLDER / "speech_data"
 FEATURES_PATH: Path = DATA_FOLDER / "features"
 DATA_INFO: Path = DATA_FOLDER / "data_info"
+MODEL_PATH: Path = DATA_FOLDER / "models"
+TESNORBOARD_PATH: Path = DATA_FOLDER / "logs"
 
 TEST_FILE: Path = DATA_INFO / "testing_list.txt"
 VALIDATION_FILE: Path = DATA_INFO / "validation_list.txt"

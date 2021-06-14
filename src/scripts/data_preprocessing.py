@@ -43,19 +43,19 @@ def fit_standardize(train_data: np.ndarray) -> StandardScaler:
     return scaler
 
 
-def apply_standardize(test_val_data: np.ndarray, scaler: StandardScaler) -> np.ndarray:
+def apply_standardize(data: np.ndarray, scaler: StandardScaler) -> np.ndarray:
 
     """
     Function to apply standardizing to the test / validation data
 
-    :param test_val_data: Test / validation data
+    :param data: Data for standardization
     :param scaler: Scaler object which has stored training mean and variance
-    :return: Standardized test / validation data
+    :return: Standardized data
     """
 
-    standardized_test_val_data = scaler.transform(test_val_data)
+    standardized_data = scaler.transform(data)
 
-    return standardized_test_val_data
+    return standardized_data
 
 
 def data_balancing(
