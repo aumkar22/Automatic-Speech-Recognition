@@ -17,7 +17,7 @@ class Mfcc(Layer):
         :param kwargs: To set trainable=False.
         """
 
-        super(Mfcc, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.sampling_frequency = 16000
         self.hop_length = int(self.sampling_frequency / 100)
         self.n_fft = 40
