@@ -2,6 +2,9 @@ import tensorflow.keras as tf
 
 from tensorflow.keras.layers import (
     Conv2D,
+    Bidirectional,
+    LSTM,
+    Lambda,
     Dense,
     Dropout,
     Flatten,
@@ -16,7 +19,7 @@ from src.models.nn_models import NnModel
 from src.models.mfcc_layer import Mfcc
 
 
-class Cnn1Param100k(NnModel):
+class CnnBiLSTMParam163k(NnModel):
     def __init__(
         self,
         N1,
@@ -29,7 +32,10 @@ class Cnn1Param100k(NnModel):
         strides2,
         pool_size2,
         pool_stride2,
-        Nfc,
+        units,
+        Nfc1,
+        dropout1,
+        dropout2,
     ):
 
         """
@@ -44,7 +50,10 @@ class Cnn1Param100k(NnModel):
         :param strides2:
         :param pool_size2:
         :param pool_stride2:
-        :param Nfc:
+        :param units:
+        :param Nfc1:
+        :param dropout1:
+        :param dropout2:
         """
 
         self.N1 = N1
@@ -57,7 +66,10 @@ class Cnn1Param100k(NnModel):
         self.strides2 = strides2
         self.pool_size2 = pool_size2
         self.pool_stride2 = pool_stride2
-        self.Nfc = Nfc
+        self.units = units
+        self.Nfc1 = Nfc1
+        self.dropout1 = dropout1
+        self.dropout2 = dropout2
         super().__init__()
         self.input_shape = (self.features,)
 
@@ -88,9 +100,17 @@ class Cnn1Param100k(NnModel):
 
         model = MaxPooling2D(pool_size=self.pool_size2, strides=self.pool_stride2)(model)
 
+        model = Lambda(lambda q: tf.backend.squeeze(q, -1))(model)
+
+        model = Bidirectional(LSTM(self.units, return_sequences=True))(model)
+
+        model = Dropout(self.dropout1)(model)
+
         model = Flatten()(model)
 
-        model = Dense(self.Nfc, activation="relu")(model)
+        model = Dense(self.Nfc1, activation="relu")(model)
+
+        model = Dropout(self.dropout2)(model)
 
         out = Dense(self.out, activation="softmax")(model)
 

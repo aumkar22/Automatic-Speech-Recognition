@@ -16,11 +16,12 @@ from src.models.nn_models import NnModel
 from src.models.mfcc_layer import Mfcc
 
 
-class Cnn1Param100k(NnModel):
+class Cnn2Param248k(NnModel):
     def __init__(
         self,
         N1,
         N2,
+        N3,
         kernel_size1,
         strides1,
         pool_size1,
@@ -29,13 +30,21 @@ class Cnn1Param100k(NnModel):
         strides2,
         pool_size2,
         pool_stride2,
-        Nfc,
+        kernel_size3,
+        strides3,
+        pool_size3,
+        pool_stride3,
+        Nfc1,
+        Nfc2,
+        dropout1,
+        dropout2,
     ):
 
         """
 
         :param N1:
         :param N2:
+        :param N3:
         :param kernel_size1:
         :param strides1:
         :param pool_size1:
@@ -44,11 +53,19 @@ class Cnn1Param100k(NnModel):
         :param strides2:
         :param pool_size2:
         :param pool_stride2:
-        :param Nfc:
+        :param kernel_size3:
+        :param strides3:
+        :param pool_size3:
+        :param pool_stride3:
+        :param Nfc1:
+        :param Nfc2:
+        :param dropout1:
+        :param dropout2:
         """
 
         self.N1 = N1
         self.N2 = N2
+        self.N3 = N3
         self.kernel_size1 = kernel_size1
         self.strides1 = strides1
         self.pool_size1 = pool_size1
@@ -57,7 +74,14 @@ class Cnn1Param100k(NnModel):
         self.strides2 = strides2
         self.pool_size2 = pool_size2
         self.pool_stride2 = pool_stride2
-        self.Nfc = Nfc
+        self.kernel_size3 = kernel_size3
+        self.strides3 = strides3
+        self.pool_size3 = pool_size3
+        self.pool_stride3 = pool_stride3
+        self.Nfc1 = Nfc1
+        self.Nfc2 = Nfc2
+        self.dropout1 = dropout1
+        self.dropout2 = dropout2
         super().__init__()
         self.input_shape = (self.features,)
 
@@ -88,9 +112,23 @@ class Cnn1Param100k(NnModel):
 
         model = MaxPooling2D(pool_size=self.pool_size2, strides=self.pool_stride2)(model)
 
+        model = Conv2D(
+            self.N3, kernel_size=self.kernel_size3, strides=self.strides3, activation="relu"
+        )(model)
+
+        model = BatchNormalization(axis=-1, scale=None)(model)
+
+        model = MaxPooling2D(pool_size=self.pool_size3, strides=self.pool_stride3)(model)
+
         model = Flatten()(model)
 
-        model = Dense(self.Nfc, activation="relu")(model)
+        model = Dense(self.Nfc1, activation="relu")(model)
+
+        model = Dropout(self.dropout1)(model)
+
+        model = Dense(self.Nfc2, activation="relu")(model)
+
+        model = Dropout(self.dropout2)(model)
 
         out = Dense(self.out, activation="softmax")(model)
 

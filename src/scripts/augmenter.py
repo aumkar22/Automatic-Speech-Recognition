@@ -13,7 +13,7 @@ class Augmentation(ABC):
     @abstractmethod
     def augment(self, features: np.ndarray) -> np.ndarray:
         """
-        Augment the sensor data
+        Augment the speech data
 
         :param features: Data that should be augmented.
         :return: Augmented data
@@ -73,6 +73,7 @@ class ScalingAugmentation(Augmentation):
 class TimeShiftAugmentation(Augmentation):
     def __init__(self, max_shift: float = 0.2):
         """
+        Initialize object to shift audio in time
 
         :param max_shift:
         """
@@ -114,7 +115,7 @@ def apply_augmentations(data: np.ndarray, augmentations: List[Augmentation]) -> 
     Iterate over experiments in the data and per experiment apply a random augmentation from the
     augmentations provided.
 
-    :param data: Data in the shape of (experiments, samples, channels) that will be augmented.
+    :param data: Data in the shape of (experiments, samples) that will be augmented.
     :param augmentations: List of augmentations from which one will be picked to apply per
                           experiment.
     :return: Data where a random augmentation is applied per experiment.

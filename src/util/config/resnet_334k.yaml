@@ -1,0 +1,15 @@
+default:
+  N1: 128
+  N2: 1
+  kernel_size1: (1, 2)
+  strides1: (1, 2)
+  pool_size1: 2
+  kernel_size2: (1, 2)
+  dilation_rate1: 2
+  dilation_rate2: 4
+  dilation_rate3: 8
+  dilation_rate4: 16
+  Nfc1: 520
+  Nfc2: 120
+  dropout1: 0.5
+  dropout2: 0.5

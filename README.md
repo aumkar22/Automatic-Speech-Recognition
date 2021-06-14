@@ -1,2 +1,2 @@
 # Automatic-Speech-Recognition
-ASR Project Repository
+Repository for ASR project: Comparing deep learning architectures for small-footprint keyword spotting

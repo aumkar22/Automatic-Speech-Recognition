@@ -16,7 +16,7 @@ from src.models.nn_models import NnModel
 from src.models.mfcc_layer import Mfcc
 
 
-class Cnn1Param100k(NnModel):
+class Cnn1Param134k(NnModel):
     def __init__(
         self,
         N1,
@@ -29,7 +29,8 @@ class Cnn1Param100k(NnModel):
         strides2,
         pool_size2,
         pool_stride2,
-        Nfc,
+        Nfc1,
+        Nfc2,
     ):
 
         """
@@ -44,7 +45,8 @@ class Cnn1Param100k(NnModel):
         :param strides2:
         :param pool_size2:
         :param pool_stride2:
-        :param Nfc:
+        :param Nfc1:
+        :param Nfc2:
         """
 
         self.N1 = N1
@@ -57,7 +59,8 @@ class Cnn1Param100k(NnModel):
         self.strides2 = strides2
         self.pool_size2 = pool_size2
         self.pool_stride2 = pool_stride2
-        self.Nfc = Nfc
+        self.Nfc1 = Nfc1
+        self.Nfc2 = Nfc2
         super().__init__()
         self.input_shape = (self.features,)
 
@@ -90,7 +93,9 @@ class Cnn1Param100k(NnModel):
 
         model = Flatten()(model)
 
-        model = Dense(self.Nfc, activation="relu")(model)
+        model = Dense(self.Nfc1, activation="relu")(model)
+
+        model = Dense(self.Nfc2, activation="relu")(model)
 
         out = Dense(self.out, activation="softmax")(model)
 

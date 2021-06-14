@@ -14,9 +14,10 @@ from tensorflow.keras.models import Model
 
 from src.models.nn_models import NnModel
 from src.models.mfcc_layer import Mfcc
+from src.models.residual_layer import Residual
 
 
-class Cnn1Param100k(NnModel):
+class ResNetParam334k(NnModel):
     def __init__(
         self,
         N1,
@@ -24,12 +25,15 @@ class Cnn1Param100k(NnModel):
         kernel_size1,
         strides1,
         pool_size1,
-        pool_stride1,
         kernel_size2,
-        strides2,
-        pool_size2,
-        pool_stride2,
-        Nfc,
+        dilation_rate1,
+        dilation_rate2,
+        dilation_rate3,
+        dilation_rate4,
+        Nfc1,
+        Nfc2,
+        dropout1,
+        dropout2,
     ):
 
         """
@@ -39,12 +43,15 @@ class Cnn1Param100k(NnModel):
         :param kernel_size1:
         :param strides1:
         :param pool_size1:
-        :param pool_stride1:
         :param kernel_size2:
-        :param strides2:
-        :param pool_size2:
-        :param pool_stride2:
-        :param Nfc:
+        :param dilation_rate1:
+        :param dilation_rate2:
+        :param dilation_rate3:
+        :param dilation_rate4:
+        :param Nfc1:
+        :param Nfc2:
+        :param dropout1:
+        :param dropout2:
         """
 
         self.N1 = N1
@@ -52,12 +59,15 @@ class Cnn1Param100k(NnModel):
         self.kernel_size1 = kernel_size1
         self.strides1 = strides1
         self.pool_size1 = pool_size1
-        self.pool_stride1 = pool_stride1
         self.kernel_size2 = kernel_size2
-        self.strides2 = strides2
-        self.pool_size2 = pool_size2
-        self.pool_stride2 = pool_stride2
-        self.Nfc = Nfc
+        self.Nfc1 = Nfc1
+        self.Nfc2 = Nfc2
+        self.dilation_rate1 = dilation_rate1
+        self.dilation_rate2 = dilation_rate2
+        self.dilation_rate3 = dilation_rate3
+        self.dilation_rate4 = dilation_rate4
+        self.dropout1 = dropout1
+        self.dropout2 = dropout2
         super().__init__()
         self.input_shape = (self.features,)
 
@@ -73,24 +83,41 @@ class Cnn1Param100k(NnModel):
         model = Mfcc(trainable=False)(model_input)
 
         model = Conv2D(
-            self.N1, kernel_size=self.kernel_size1, strides=self.strides1, activation="relu"
+            self.N1,
+            kernel_size=self.kernel_size1,
+            strides=self.strides1,
+            activation="relu",
+            padding="same",
         )(model)
 
         model = BatchNormalization(axis=-1, scale=None)(model)
 
-        model = MaxPooling2D(pool_size=self.pool_size1, strides=self.pool_stride1)(model)
+        model = Residual(self.N1, self.kernel_size1, self.dilation_rate1)(model)
+
+        model = Residual(self.N1, self.kernel_size1, self.dilation_rate2)(model)
+
+        model = Residual(self.N1, self.kernel_size1, self.dilation_rate3)(model)
 
         model = Conv2D(
-            self.N2, kernel_size=self.kernel_size2, strides=self.strides2, activation="relu"
+            self.N2,
+            kernel_size=self.kernel_size2,
+            activation="relu",
+            dilation_rate=self.dilation_rate4,
         )(model)
 
         model = BatchNormalization(axis=-1, scale=None)(model)
 
-        model = MaxPooling2D(pool_size=self.pool_size2, strides=self.pool_stride2)(model)
+        model = MaxPooling2D(pool_size=self.pool_size1)(model)
 
         model = Flatten()(model)
 
-        model = Dense(self.Nfc, activation="relu")(model)
+        model = Dense(self.Nfc1, activation="relu")(model)
+
+        model = Dropout(self.dropout1)(model)
+
+        model = Dense(self.Nfc2, activation="relu")(model)
+
+        model = Dropout(self.dropout2)(model)
 
         out = Dense(self.out, activation="softmax")(model)
 
