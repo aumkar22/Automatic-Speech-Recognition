@@ -1,8 +1,8 @@
 import numpy as np
 
-from typing import Tuple
+from typing import Tuple, List
 from imblearn.over_sampling import RandomOverSampler
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelBinarizer
 
 
 def data_length_fix(signal: np.ndarray, number_samples: int = 16000) -> np.ndarray:
@@ -75,3 +75,17 @@ def data_balancing(
     train_data_resampled, train_labels_resampled = resampler.fit_resample(train_data, train_labels)
 
     return train_data_resampled, train_labels_resampled
+
+
+def data_encode(label: List[str]) -> np.ndarray:
+
+    """
+    Function to encode data labels for training
+
+    :param label: List of string labels
+    :return: Array of encoded labels
+    """
+
+    encoder = LabelBinarizer()
+
+    return encoder.fit_transform(label)

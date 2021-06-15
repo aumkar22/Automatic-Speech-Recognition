@@ -120,9 +120,7 @@ def apply_augmentations(data: np.ndarray, augmentations: List[Augmentation]) -> 
                           experiment.
     :return: Data where a random augmentation is applied per experiment.
     """
-    # There are different ways to do this, including creating a list of augmented experiments and
-    # stacking these, however this approach is about 10% faster. Ideally we'd use another approach
-    # and do away with the for loop entirely, but we haven't found a suitable solution yet.
+
     augmented_data = np.empty(data.shape)
     for i, experiment in enumerate(data):
         augmented_data[i] = random.choice(augmentations).augment(experiment)
