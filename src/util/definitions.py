@@ -16,3 +16,42 @@ VALIDATION_FILE: Path = DATA_INFO / "validation_list.txt"
 # Loading test and validation file names in pandas dataframe
 test_df = pd.read_csv(TEST_FILE, sep=" ", header=None)[0].tolist()
 val_df = pd.read_csv(VALIDATION_FILE, sep=" ", header=None)[0].tolist()
+
+
+classes = [
+    "backward",
+    "bed",
+    "bird",
+    "cat",
+    "dog",
+    "down",
+    "eight",
+    "five",
+    "follow",
+    "forward",
+    "four",
+    "go",
+    "happy",
+    "house",
+    "learn",
+    "left",
+    "marvin",
+    "nine",
+    "no",
+    "off",
+    "on",
+    "one",
+    "right",
+    "seven",
+    "sheila",
+    "six",
+    "stop",
+    "three",
+    "tree",
+    "two",
+    "up",
+    "visual",
+    "wow",
+    "yes",
+    "zero",
+]
