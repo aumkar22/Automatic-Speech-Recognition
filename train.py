@@ -12,11 +12,6 @@ from src.util.definitions import *
 from src.scripts.save_processed_data import save_data
 from src.models.eval import EvalVisualize
 
-# params = yaml.safe_load((CONFIG_PATH / "cnn1_99k.yaml").open())
-#
-#
-# breakpoint()
-
 
 def train(
     model: NnModel,
