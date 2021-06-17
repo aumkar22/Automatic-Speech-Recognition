@@ -8,14 +8,18 @@ DATA_PATH: Path = DATA_FOLDER / "speech_data"
 FEATURES_PATH: Path = DATA_FOLDER / "features"
 DATA_INFO: Path = DATA_FOLDER / "data_info"
 MODEL_PATH: Path = DATA_FOLDER / "models"
-TESNORBOARD_PATH: Path = DATA_FOLDER / "logs"
-
+MODEL_SCRIPTS_PATH = PROJECT_PATH / "src" / "models"
+TENSORBOARD_PATH: Path = DATA_FOLDER / "logs"
+CONFIG_PATH: Path = PROJECT_PATH / "src" / "util" / "config"
+PREPROCESSED_PATH: Path = DATA_FOLDER / "preprocessed"
+METRICS_PATH: Path = DATA_FOLDER / "metrics"
+PLOTS_PATH: Path = PROJECT_PATH / "plots"
 TEST_FILE: Path = DATA_INFO / "testing_list.txt"
 VALIDATION_FILE: Path = DATA_INFO / "validation_list.txt"
 
 # Loading test and validation file names in pandas dataframe
-test_df = pd.read_csv(TEST_FILE, sep=" ", header=None)[0].tolist()
-val_df = pd.read_csv(VALIDATION_FILE, sep=" ", header=None)[0].tolist()
+test_list_from_df = pd.read_csv(TEST_FILE, sep=" ", header=None)[0].tolist()
+val_list_from_df = pd.read_csv(VALIDATION_FILE, sep=" ", header=None)[0].tolist()
 
 
 classes = [

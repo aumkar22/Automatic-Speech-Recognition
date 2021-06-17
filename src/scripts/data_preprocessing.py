@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import Tuple, List
 from imblearn.over_sampling import RandomOverSampler
-from sklearn.preprocessing import StandardScaler, LabelBinarizer
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 
 def data_length_fix(signal: np.ndarray, number_samples: int = 16000) -> np.ndarray:
@@ -86,6 +86,6 @@ def data_encode(label: List[str]) -> np.ndarray:
     :return: Array of encoded labels
     """
 
-    encoder = LabelBinarizer()
+    encoder = LabelEncoder()
 
     return encoder.fit_transform(label)

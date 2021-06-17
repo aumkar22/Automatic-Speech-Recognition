@@ -41,7 +41,7 @@ def train_data_labels_list(
     return train_list, train_lab
 
 
-def wav2numpy(wav_list: List[str]) -> Tuple[List[int], List[np.ndarray]]:
+def wav2numpy(wav_list: List[str]) -> np.ndarray:
 
     """
     Function to load wav files into numpy arrays
@@ -50,12 +50,10 @@ def wav2numpy(wav_list: List[str]) -> Tuple[List[int], List[np.ndarray]]:
     :return: Lists of sampling frequencies and read numpy arrays
     """
 
-    sampling_rate_list, wav_data_list = [], []
+    wav_data_list = []
 
     for wav_file in wav_list:
         sampling_rate, wav_data = wavfile.read(wav_file)
-
-        sampling_rate_list.append(sampling_rate)
         wav_data_list.append(wav_data)
 
-    return sampling_rate_list, wav_data_list
+    return np.array(wav_data_list)

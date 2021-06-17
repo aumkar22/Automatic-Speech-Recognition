@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import seaborn as sns
-import pandas as pd
 
 from typing import NoReturn
 from pathlib import Path
@@ -65,13 +64,11 @@ class EvalVisualize(object):
         cm = confusion_matrix(self.ytrue, self.ypred)
         normalized_cm = np.expand_dims((cm.astype("float") / cm.sum(axis=1)), axis=1)
 
-        cm_df = pd.DataFrame(normalized_cm, index=classes, columns=classes)
-
         if not save_path:
             save_path.mkdir(exist_ok=True, parents=True)
 
         plt.figure(figsize=(25, 25))
-        sns.heatmap(cm_df, annot=True)
+        sns.heatmap(normalized_cm, annot=True, xticklabels=classes, yticklabels=classes, fmt="g")
         plt.title("Normalized confusion matrix")
         plt.ylabel("True label", fontsize=30)
         plt.xlabel("Predicted label", fontsize=30)

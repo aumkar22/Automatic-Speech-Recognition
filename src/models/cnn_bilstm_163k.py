@@ -72,6 +72,7 @@ class CnnBiLSTMParam163k(NnModel):
         self.dropout2 = dropout2
         super().__init__()
         self.input_shape = (self.features,)
+        self.model_out = None
 
     def model_architecture(self) -> tf.Model:
 
@@ -114,13 +115,10 @@ class CnnBiLSTMParam163k(NnModel):
 
         out = Dense(self.out, activation="softmax")(model)
 
-        model_out = Model(inputs=[model_input], outputs=out)
-
-        return model_out
+        self.model_out = Model(inputs=[model_input], outputs=out)
 
     def model_compile(
         self,
-        model: tf.Model,
         learning_rate: float = 1e-4,
         beta1: float = 0.9,
         beta2: float = 0.999,
@@ -130,7 +128,6 @@ class CnnBiLSTMParam163k(NnModel):
         """
         Function to compile the model
 
-        :param model: Uncompiled Keras model
         :param learning_rate: Initial learning rate for ADAM optimizer
         :param beta1: Exponential decay rate for the running average of the gradient
         :param beta2: Exponential decay rate for the running average of the square of the gradient
@@ -139,8 +136,10 @@ class CnnBiLSTMParam163k(NnModel):
         """
 
         adam = Adam(lr=learning_rate, beta_1=beta1, beta_2=beta2, epsilon=epsilon)
-        model.compile(
-            loss="categorical_crossentropy", optimizer=adam, metrics=["categorical_accuracy"]
+        self.model_out.compile(
+            loss="sparse_categorical_crossentropy",
+            optimizer=adam,
+            metrics=["sparse_categorical_accuracy"],
         )
 
-        return model
+        return self.model_out

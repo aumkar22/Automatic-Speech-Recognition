@@ -41,7 +41,6 @@ class NnModel(ABC):
     @abstractmethod
     def model_compile(
         self,
-        model: tf.Model,
         learning_rate: float = 1e-4,
         beta1: float = 0.9,
         beta2: float = 0.999,
@@ -78,7 +77,7 @@ class NnModel(ABC):
         return new_lr
 
     @classmethod
-    def model_callbacks(cls, save_path: Path, log_path: Path) -> List[tf.callbacks]:
+    def model_callbacks(cls, save_path: Path, log_path: Path) -> List:
 
         """
         Function for adding model callbacks
