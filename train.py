@@ -5,7 +5,7 @@ import importlib, inspect
 
 from typing import Dict, Optional, Tuple
 
-from src.models.cnn1_99k import *
+from src.models.nn_models import NnModel
 from src.scripts.augmenter import *
 from src.scripts.generator import BatchGenerator
 from src.util.definitions import *
