@@ -87,9 +87,9 @@ class NnModel(ABC):
         :return: List of callbacks
         """
 
-        if not save_path:
+        if not save_path.exists():
             save_path.mkdir(exist_ok=True, parents=True)
-        if not log_path:
+        if not log_path.exists():
             log_path.mkdir(exist_ok=True, parents=True)
 
         tensorboard_callback = TensorBoard(log_dir=log_path)

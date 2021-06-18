@@ -1,9 +1,8 @@
 import yaml
-import tensorflow.keras as tf
 import argparse
 import importlib, inspect
 
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 from src.models.nn_models import NnModel
 from src.scripts.augmenter import *
@@ -19,15 +18,25 @@ def train(
     val_data: Tuple[np.ndarray, ...],
     test_data: Tuple[np.ndarray, ...],
     augmentations: Optional[List[Augmentation]],
+    model_name: str,
 ):
 
-    train_generator = BatchGenerator(train_data[0], train_data[1], augmentations=augmentations)
-    validation_generator = BatchGenerator(val_data[0], val_data[1], augmentations=None)
-    test_generator = BatchGenerator(test_data[0], test_data[1], augmentations=None)
+    train_generator = BatchGenerator(
+        train_data[0], train_data[1], augmentations=augmentations, train=True
+    )
+    validation_generator = BatchGenerator(
+        val_data[0], val_data[1], augmentations=None, train=False
+    )
+    test_generator = BatchGenerator(test_data[0], test_data[1], augmentations=None, train=False)
 
-    compiled_model = model.model_compile()
-    callbacks = model.model_callbacks(MODEL_PATH, TENSORBOARD_PATH)
+    model_architecture = model.model_architecture()
+    compiled_model = model_architecture.model_compile()
+    print(compiled_model.summary())
+    callbacks = model_architecture.model_callbacks(
+        Path(MODEL_PATH / f"{model_name}"), Path(TENSORBOARD_PATH / f"{model_name}")
+    )
 
+    print("Training...")
     compiled_model.fit_generator(
         train_generator,
         validation_generator=validation_generator,
@@ -37,14 +46,19 @@ def train(
         workers=6,
     )
 
+    print("Predicting on test set")
     test_predict = compiled_model.predict_generator(
         test_generator, use_multiprocessing=True, workers=6
     )
     predictions = np.argmax(test_predict, 1)
 
     evaluation_visualization = EvalVisualize(test_data[1], predictions)
-    evaluation_visualization.get_metrics(Path(METRICS_PATH / "metrics.pkl"), print_report=True)
-    evaluation_visualization.get_confusion_matrix(Path(PLOTS_PATH / "plot.png"))
+    evaluation_visualization.get_metrics(
+        Path(METRICS_PATH / f"metrics_{model_name}.pkl"), print_report=True
+    )
+    evaluation_visualization.get_confusion_matrix(
+        Path(PLOTS_PATH / f"plot_{model_name}.png"), plot_matrix=True
+    )
 
 
 if __name__ == "__main__":
@@ -78,14 +92,14 @@ if __name__ == "__main__":
 
     for path_ in list(CONFIG_PATH.glob(r"*.yaml")):
         if path_.stem.split("_")[-1] == model_choose:
-            params = yaml.safe_load(path_.open())
+            params = yaml.safe_load(path_.open())["default"]
             break
 
     for path_ in list(MODEL_SCRIPTS_PATH.glob(r"*.py")):
         if path_.stem.split("_")[-1] == model_choose:
             module = importlib.import_module(f"src.models.{model_}")
             for name, class_ in inspect.getmembers(module, inspect.isclass):
-                if str(name)[-1] == "k":
+                if str(name)[-1] == "k" and str(name)[-2].isdigit():
                     module_source = importlib.import_module(f"src.models.{model_}")
                     model_to_train = getattr(module_source, f"{name}")
                     break
@@ -101,3 +115,12 @@ if __name__ == "__main__":
     ytrain = np.load(str(FEATURES_PATH / "train_labels.npy"))
     yval = np.load(str(FEATURES_PATH / "val_labels.npy"))
     ytest = np.load(str(FEATURES_PATH / "test_labels.npy"))
+
+    get_model = model_to_train(**params)
+    augmentations_list = [
+        JitterAugmentation,
+        ScalingAugmentation,
+        TimeShiftAugmentation,
+        NoChangeAugmentation,
+    ]
+    train(get_model, (xtrain, ytrain), (xval, yval), (xtest, ytest), augmentations_list, name)

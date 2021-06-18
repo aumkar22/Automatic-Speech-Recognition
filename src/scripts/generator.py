@@ -5,6 +5,7 @@ import numpy as np
 from typing import List, Optional, Tuple, NoReturn
 from tensorflow.keras.utils import Sequence
 
+from src.scripts.data_preprocessing import data_balancing
 from src.scripts.augmenter import Augmentation, apply_augmentations
 
 
@@ -16,6 +17,7 @@ class BatchGenerator(Sequence):
         batch_size: int = 128,
         shuffle: bool = True,
         augmentations: Optional[List[Augmentation]] = None,
+        train: bool = False,
     ):
         """
         Batch generator based on Keras's Sequence class. This generates batches of size batch_size
@@ -27,6 +29,7 @@ class BatchGenerator(Sequence):
         :param shuffle: Whether or not data should be shuffled.
         :param augmentations: Optional list of augmentations to be applied on a per-experiment
                               basis.
+        :param train: True, if training.
         """
         self.features = features
         self.labels = labels
@@ -39,6 +42,7 @@ class BatchGenerator(Sequence):
         self.indices = list(range(features.shape[0]))
         # Make sure we start shuffled if needed.
         self._shuffle_indices(self.shuffle)
+        self.train = train
 
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, List[None]]:
         """
@@ -56,6 +60,8 @@ class BatchGenerator(Sequence):
         feature_batch = self.features[batch_indices]
         label_batch = self.labels[batch_indices]
 
+        if self.train:
+            feature_batch, label_batch = data_balancing(feature_batch, label_batch)
         if self.augmentations:
             feature_batch = apply_augmentations(feature_batch, self.augmentations)
 

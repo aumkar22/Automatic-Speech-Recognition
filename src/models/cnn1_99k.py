@@ -87,7 +87,7 @@ class Cnn1Param99k(NnModel):
         model_input = Input(shape=self.input_shape)
 
         model = Mfcc(trainable=False)(model_input)
-
+        breakpoint()
         model = Conv2D(
             self.N1, kernel_size=self.kernel_size1, strides=self.strides1, activation="relu"
         )(model)
@@ -148,6 +148,3 @@ class Cnn1Param99k(NnModel):
         )
 
         return self.model_out
-
-
-breakpoint()

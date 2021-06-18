@@ -46,7 +46,7 @@ class EvalVisualize(object):
         if print_report:
             print(result)
 
-        if not save_path:
+        if not save_path.exists():
             save_path.mkdir(exist_ok=True, parents=True)
 
         pickle.dump(result, save_path.open("wb"))
@@ -64,7 +64,7 @@ class EvalVisualize(object):
         cm = confusion_matrix(self.ytrue, self.ypred)
         normalized_cm = np.expand_dims((cm.astype("float") / cm.sum(axis=1)), axis=1)
 
-        if not save_path:
+        if not save_path.exists():
             save_path.mkdir(exist_ok=True, parents=True)
 
         plt.figure(figsize=(25, 25))

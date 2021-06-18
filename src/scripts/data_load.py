@@ -41,7 +41,7 @@ def train_data_labels_list(
     return train_list, train_lab
 
 
-def wav2numpy(wav_list: List[str]) -> np.ndarray:
+def wav2numpy(wav_list: List[str]) -> Tuple[np.ndarray, List[int]]:
 
     """
     Function to load wav files into numpy arrays
@@ -51,9 +51,14 @@ def wav2numpy(wav_list: List[str]) -> np.ndarray:
     """
 
     wav_data_list = []
+    wav_to_ignore_index = []
 
-    for wav_file in wav_list:
+    for wav_index, wav_file in enumerate(wav_list):
         sampling_rate, wav_data = wavfile.read(wav_file)
-        wav_data_list.append(wav_data)
-
-    return np.array(wav_data_list)
+        # Since Google speech dataset was collected with a sampling frequency of 16KHz,
+        # data with less than 15k length was ignored.
+        if len(wav_data) < 15000:
+            wav_to_ignore_index.append(wav_index)
+        else:
+            wav_data_list.append(wav_data)
+    return np.array(wav_data_list), wav_to_ignore_index
