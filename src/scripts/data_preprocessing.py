@@ -3,6 +3,7 @@ import numpy as np
 from typing import Tuple, List
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.preprocessing import StandardScaler, LabelEncoder
+from python_speech_features import mfcc
 
 
 def data_length_fix(signal: np.ndarray, number_samples: int = 16000) -> np.ndarray:
@@ -89,3 +90,14 @@ def data_encode(label: List[str]) -> np.ndarray:
     encoder = LabelEncoder()
 
     return encoder.fit_transform(label)
+
+
+def mfcc_extractor(wav_array: np.ndarray) -> np.ndarray:
+
+    """
+    Function to extract Mel Frequency Cepstral Coefficients (MFCC) features from wav numpy arrays
+    :param wav_array: Numpy array of wav files
+    :return: Extracted MFCC features
+    """
+
+    return mfcc(wav_array, winlen=0.03, numcep=40, nfilt=40).T

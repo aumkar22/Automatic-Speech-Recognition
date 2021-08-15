@@ -25,9 +25,11 @@ def apply_preprocess(
         data = np.array(list(map(data_length_fix, data)))
 
     standardized_data = apply_standardize(data, data_scaler)
+    mfcc_standardized_data = np.array(list(map(mfcc_extractor, standardized_data)))
+    mfcc_standardized_data = np.expand_dims(mfcc_standardized_data, axis=-1)
     encoded_label = data_encode(labels)
 
-    return standardized_data, encoded_label
+    return mfcc_standardized_data, encoded_label
 
 
 def save_data(save_path: Path) -> NoReturn:

@@ -83,10 +83,9 @@ class Cnn2Param248k(NnModel):
         self.dropout1 = dropout1
         self.dropout2 = dropout2
         super().__init__()
-        self.input_shape = (self.features,)
         self.model_out = None
 
-    def model_architecture(self) -> tf.Model:
+    def model_architecture(self):
 
         """
 
@@ -95,11 +94,9 @@ class Cnn2Param248k(NnModel):
 
         model_input = Input(shape=self.input_shape)
 
-        model = Mfcc(trainable=False)(model_input)
-
         model = Conv2D(
             self.N1, kernel_size=self.kernel_size1, strides=self.strides1, activation="relu"
-        )(model)
+        )(model_input)
 
         model = BatchNormalization(axis=-1, scale=None)(model)
 

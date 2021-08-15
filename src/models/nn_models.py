@@ -18,16 +18,18 @@ class NnModel(ABC):
     in this project should inherit this class for a consistent interface
     """
 
-    def __init__(self, features: int = 16000, out: int = 35):
+    def __init__(self, num_ceps: int = 40, num_frames: int = 98, out: int = 35):
 
         """
         Initialize the model with hyperparameters
 
-        :param features: Preprocessed audio input
+        :param num_ceps: Preprocessed audio input
         :param out: Number of classes
         """
 
-        self.features = features
+        self.num_ceps = num_ceps
+        self.num_frames = num_frames
+        self.input_shape = (self.num_ceps, self.num_frames, 1)
         self.out = out
 
     @abstractmethod

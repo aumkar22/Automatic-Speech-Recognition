@@ -17,7 +17,7 @@ def train(
     train_data: Tuple[np.ndarray, ...],
     val_data: Tuple[np.ndarray, ...],
     test_data: Tuple[np.ndarray, ...],
-    augmentations: Optional[List[Augmentation]],
+    augmentations: List[Augmentation],
     model_name: str,
 ):
 
@@ -29,17 +29,19 @@ def train(
     )
     test_generator = BatchGenerator(test_data[0], test_data[1], augmentations=None, train=False)
 
-    model_architecture = model.model_architecture()
-    compiled_model = model_architecture.model_compile()
+    model.model_architecture()
+    compiled_model = model.model_compile()
+
     print(compiled_model.summary())
-    callbacks = model_architecture.model_callbacks(
+
+    callbacks = model.model_callbacks(
         Path(MODEL_PATH / f"{model_name}"), Path(TENSORBOARD_PATH / f"{model_name}")
     )
 
     print("Training...")
     compiled_model.fit_generator(
         train_generator,
-        validation_generator=validation_generator,
+        validation_data=validation_generator,
         epochs=500,
         callbacks=callbacks,
         use_multiprocessing=True,
