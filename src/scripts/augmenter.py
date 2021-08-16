@@ -64,9 +64,7 @@ class ScalingAugmentation(Augmentation):
         :param features:
         :return:
         """
-        scaling_factor = np.random.normal(
-            loc=self._mean, scale=self._std, size=(1, features.shape[1])
-        )
+        scaling_factor = np.random.normal(loc=self._mean, scale=self._std, size=features.shape)
         return features * scaling_factor
 
 
@@ -77,7 +75,6 @@ class TimeShiftAugmentation(Augmentation):
 
         :param max_shift:
         """
-
         self.max_shift = max_shift
 
     # Function taken from https://github.com/PJansson/speech/blob/master/utils/data.py
@@ -123,5 +120,5 @@ def apply_augmentations(data: np.ndarray, augmentations: List[Augmentation]) -> 
 
     augmented_data = np.empty(data.shape)
     for i, experiment in enumerate(data):
-        augmented_data[i] = random.choice(augmentations).augment(experiment)
+        augmented_data[i] = random.choice(augmentations)().augment(experiment)
     return augmented_data

@@ -7,6 +7,7 @@ from tensorflow.keras.utils import Sequence
 
 from src.scripts.data_preprocessing import data_balancing
 from src.scripts.augmenter import Augmentation, apply_augmentations
+from src.scripts.data_preprocessing import mfcc_extractor
 
 
 class BatchGenerator(Sequence):
@@ -14,10 +15,10 @@ class BatchGenerator(Sequence):
         self,
         features: np.ndarray,
         labels: np.ndarray,
-        batch_size: int = 128,
+        batch_size: int = 64,
         shuffle: bool = True,
         augmentations: Optional[List[Augmentation]] = None,
-        train: bool = False,
+        balance: bool = True,
     ):
         """
         Batch generator based on Keras's Sequence class. This generates batches of size batch_size
@@ -29,7 +30,7 @@ class BatchGenerator(Sequence):
         :param shuffle: Whether or not data should be shuffled.
         :param augmentations: Optional list of augmentations to be applied on a per-experiment
                               basis.
-        :param train: True, if training.
+        :param balance: Balance training data batch.
         """
         self.features = features
         self.labels = labels
@@ -42,7 +43,7 @@ class BatchGenerator(Sequence):
         self.indices = list(range(features.shape[0]))
         # Make sure we start shuffled if needed.
         self._shuffle_indices(self.shuffle)
-        self.train = train
+        self.balance = balance
 
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, List[None]]:
         """
@@ -60,14 +61,17 @@ class BatchGenerator(Sequence):
         feature_batch = self.features[batch_indices]
         label_batch = self.labels[batch_indices]
 
-        if self.train:
+        if self.balance:
             feature_batch, label_batch = data_balancing(feature_batch, label_batch)
         if self.augmentations:
             feature_batch = apply_augmentations(feature_batch, self.augmentations)
 
+        mfcc_feature_batch = np.array(list(map(mfcc_extractor, feature_batch)))
+        mfcc_feature_batch = np.expand_dims(mfcc_feature_batch, axis=-1)
+
         # See https://stackoverflow.com/a/60131716 for the reason behind the [None].
         # IMPORTANT: [None] should be removed once TensorFlow is upgraded to v2.2.
-        return feature_batch, label_batch, [None]
+        return mfcc_feature_batch, label_batch, [None]
 
     def __len__(self) -> int:
         """

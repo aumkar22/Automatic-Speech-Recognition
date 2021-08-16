@@ -97,7 +97,7 @@ class NnModel(ABC):
         tensorboard_callback = TensorBoard(log_dir=log_path)
         step_decay_lr = LearningRateScheduler(cls._step_decay)
         model_checkpoint = ModelCheckpoint(
-            filepath=save_path, monitor="val_categorical_accuracy", save_best_only=True
+            filepath=str(save_path), monitor="val_categorical_accuracy", save_best_only=True
         )
         early_stopper = EarlyStopping(monitor="val_categorical_accuracy", patience=10, verbose=1)
 

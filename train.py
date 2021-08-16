@@ -2,7 +2,7 @@ import yaml
 import argparse
 import importlib, inspect
 
-from typing import Optional, Tuple
+from typing import Tuple
 
 from src.models.nn_models import NnModel
 from src.scripts.augmenter import *
@@ -22,12 +22,12 @@ def train(
 ):
 
     train_generator = BatchGenerator(
-        train_data[0], train_data[1], augmentations=augmentations, train=True
+        train_data[0], train_data[1], augmentations=augmentations, balance=True
     )
     validation_generator = BatchGenerator(
-        val_data[0], val_data[1], augmentations=None, train=False
+        val_data[0], val_data[1], augmentations=None, balance=False
     )
-    test_generator = BatchGenerator(test_data[0], test_data[1], augmentations=None, train=False)
+    test_generator = BatchGenerator(test_data[0], test_data[1], augmentations=None, balance=False)
 
     model.model_architecture()
     compiled_model = model.model_compile()
@@ -39,13 +39,8 @@ def train(
     )
 
     print("Training...")
-    compiled_model.fit_generator(
-        train_generator,
-        validation_data=validation_generator,
-        epochs=500,
-        callbacks=callbacks,
-        use_multiprocessing=True,
-        workers=6,
+    compiled_model.fit(
+        train_generator, validation_data=validation_generator, epochs=500, callbacks=callbacks,
     )
 
     print("Predicting on test set")
