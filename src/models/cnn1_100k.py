@@ -13,7 +13,6 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 
 from src.models.nn_models import NnModel
-from src.models.mfcc_layer import Mfcc
 
 
 class Cnn1Param100k(NnModel):
