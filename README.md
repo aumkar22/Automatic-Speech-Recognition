@@ -31,7 +31,6 @@ Automatic-Speech-Recognition
       |    testing_list.txt  
       |    validation_list.txt                                 
       |    ...   
-      |
       └───logs                                            // Tensorboard logs
       |      └───Cnn1Param99k 
       |      └───ResNetParam334k                                                 
