@@ -64,9 +64,7 @@ def train(
     )
 
     print("Predicting on test set")
-    test_predict = compiled_model.predict_generator(
-        test_generator, use_multiprocessing=True, workers=6
-    )
+    test_predict = compiled_model.predict(test_generator, use_multiprocessing=True, workers=6)
     predictions = np.argmax(test_predict, 1)
 
     evaluation_visualization = EvalVisualize(test_data[1], predictions)
