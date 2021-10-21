@@ -1,6 +1,22 @@
 # Automatic-Speech-Recognition
 Repository for ASR course project: Comparing deep learning architectures for small-footprint keyword spotting
 
+## Running the code
+
+Install dependencies as:
+
+```
+pip install -r requirements.txt
+```
+
+To train a model, if you do not have preprocessed data, you can run this code from command line as:
+
+```
+python train.py --model=resnet_334k --preprocess=False
+```
+
+If you already have preprocessed data, set ```--preprocess=True```. If ```model``` parameter is not mentioned, default would be used.
+
 ## Data Set
 Google Speech Commands data set v0.02 was used for the project. Data can be downloaded from here: http://download.tensorflow.org/data/speech_commands_v0.02.tar.gz
 
