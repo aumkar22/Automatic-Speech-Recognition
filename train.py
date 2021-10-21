@@ -7,10 +7,10 @@ from typing import Tuple
 
 from src.models.nn_models import NnModel
 from src.scripts.augmenter import *
-from src.scripts.generator import BatchGenerator
 from src.util.definitions import *
 from src.scripts.save_processed_data import save_data
 from src.models.eval import EvalVisualize
+from src.scripts.dataset_creation import create_dataset_generator
 
 
 def train(
@@ -21,14 +21,14 @@ def train(
     augmentations: List[Augmentation],
     model_name: str,
 ):
-
-    train_generator = BatchGenerator(
-        train_data[0], train_data[1], augmentations=augmentations, balance=True
+    cache_path = Path(CACHE_PATH / f"{model_name}")
+    train_generator = create_dataset_generator(
+        train_data[0], train_data[1], True, augmentations, cache_path
     )
-    validation_generator = BatchGenerator(
-        val_data[0], val_data[1], augmentations=None, balance=False
+    validation_generator = create_dataset_generator(
+        val_data[0], val_data[1], False, None, cache_path
     )
-    test_generator = BatchGenerator(test_data[0], test_data[1], augmentations=None, balance=False)
+    test_generator = create_dataset_generator(test_data[0], test_data[1], False, None, cache_path)
 
     model.model_architecture()
     compiled_model = model.model_compile()
