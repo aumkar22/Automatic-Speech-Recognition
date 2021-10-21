@@ -1,6 +1,5 @@
 import tensorflow.keras as tf
 
-from pathlib import Path
 from abc import ABC, abstractmethod
 from typing import List
 from tensorflow.keras.callbacks import (
@@ -9,6 +8,8 @@ from tensorflow.keras.callbacks import (
     EarlyStopping,
     TensorBoard,
 )
+
+from src.util.folder_check import *
 
 
 class NnModel(ABC):
@@ -43,7 +44,7 @@ class NnModel(ABC):
     @abstractmethod
     def model_compile(
         self,
-        learning_rate: float = 1e-4,
+        learning_rate: float = 1e-2,
         beta1: float = 0.9,
         beta2: float = 0.999,
         epsilon: float = 1e-8,
@@ -68,7 +69,7 @@ class NnModel(ABC):
         """
 
         drop = 0.4
-        epochs_drop = 10.0
+        epochs_drop = 15.0
         new_lr = learning_rate * (drop ** ((1 + epoch) // epochs_drop))
 
         if new_lr < 4e-5:
@@ -89,10 +90,8 @@ class NnModel(ABC):
         :return: List of callbacks
         """
 
-        if not save_path.exists():
-            save_path.mkdir(exist_ok=True, parents=True)
-        if not log_path.exists():
-            log_path.mkdir(exist_ok=True, parents=True)
+        path_check(save_path, True)
+        path_check(log_path, True)
 
         tensorboard_callback = TensorBoard(log_dir=log_path)
         step_decay_lr = LearningRateScheduler(cls._step_decay)
@@ -100,7 +99,7 @@ class NnModel(ABC):
             filepath=str(save_path), monitor="val_sparse_categorical_accuracy", save_best_only=True
         )
         early_stopper = EarlyStopping(
-            monitor="val_sparse_categorical_accuracy", patience=10, verbose=1
+            monitor="val_sparse_categorical_accuracy", patience=2, verbose=1
         )
 
         return [tensorboard_callback, step_decay_lr, model_checkpoint, early_stopper]

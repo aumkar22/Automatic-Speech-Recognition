@@ -1,6 +1,7 @@
 import yaml
 import argparse
 import importlib, inspect
+import tensorflow as tf
 
 from typing import Tuple
 
@@ -37,7 +38,7 @@ def train(
     callbacks = model.model_callbacks(
         Path(MODEL_PATH / f"{model_name}"), Path(TENSORBOARD_PATH / f"{model_name}")
     )
-
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices("GPU")))
     print("Training...")
     compiled_model.fit(
         train_generator, validation_data=validation_generator, epochs=500, callbacks=callbacks,
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-p",
         "--preprocess",
-        help="Boolean option to select of data is " "preprocessed",
+        help="Boolean option to select if data is preprocessed",
         choices=["False", "True"],
         default="False",
     )

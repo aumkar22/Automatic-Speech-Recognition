@@ -3,14 +3,13 @@ import matplotlib.pyplot as plt
 import pickle
 import seaborn as sns
 
-from typing import NoReturn
-from pathlib import Path
 from sklearn.metrics import (
     confusion_matrix,
     classification_report,
 )
 
 from src.util.definitions import classes
+from src.util.folder_check import *
 
 
 class EvalVisualize(object):
@@ -46,9 +45,7 @@ class EvalVisualize(object):
         if print_report:
             print(result)
 
-        if not save_path.exists():
-            save_path.mkdir(exist_ok=True, parents=True)
-
+        path_check(save_path, True)
         pickle.dump(result, save_path.open("wb"))
 
     def get_confusion_matrix(self, save_path: Path, plot_matrix: bool = False) -> NoReturn:
@@ -64,8 +61,7 @@ class EvalVisualize(object):
         cm = confusion_matrix(self.ytrue, self.ypred)
         normalized_cm = np.expand_dims((cm.astype("float") / cm.sum(axis=1)), axis=1)
 
-        if not save_path.exists():
-            save_path.mkdir(exist_ok=True, parents=True)
+        path_check(save_path, True)
 
         plt.figure(figsize=(25, 25))
         sns.heatmap(normalized_cm, annot=True, xticklabels=classes, yticklabels=classes, fmt="g")
