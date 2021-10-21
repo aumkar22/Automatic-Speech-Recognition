@@ -3,7 +3,7 @@ import argparse
 import importlib, inspect
 import tensorflow as tf
 
-from typing import Tuple
+from typing import Tuple, NoReturn
 
 from src.models.nn_models import NnModel
 from src.scripts.augmenter import *
@@ -20,15 +20,33 @@ def train(
     test_data: Tuple[np.ndarray, ...],
     augmentations: List[Augmentation],
     model_name: str,
-):
-    cache_path = Path(CACHE_PATH / f"{model_name}")
+) -> NoReturn:
+    """
+    Function to train the model
+
+    :param model: Model to train
+    :param train_data: Train data
+    :param val_data: Validation data
+    :param test_data: Test data
+    :param augmentations: List of augmentations for training
+    :param model_name: Name of the model to train
+    """
+
+    cache_path_train = Path(CACHE_PATH / f"train_{model_name}")
+    cache_path_val = Path(CACHE_PATH / f"val_{model_name}")
+    cache_path_test = Path(CACHE_PATH / f"test_{model_name}")
     train_generator = create_dataset_generator(
-        train_data[0], train_data[1], True, augmentations, cache_path
+        train_data[0], train_data[1], True, augmentations, cache_path_train
     )
     validation_generator = create_dataset_generator(
-        val_data[0], val_data[1], False, None, cache_path
+        val_data[0], val_data[1], False, None, cache_path_val
     )
-    test_generator = create_dataset_generator(test_data[0], test_data[1], False, None, cache_path)
+    test_generator = create_dataset_generator(
+        test_data[0], test_data[1], False, None, cache_path_test
+    )
+    for train_data, train_labels in train_generator.take(1):
+        print("Train data shape: ", train_data.shape)
+        print("Train label shape: ", train_labels.shape)
 
     model.model_architecture()
     compiled_model = model.model_compile()

@@ -1,12 +1,10 @@
 import math
-import random
 import numpy as np
 import tensorflow as tf
 
-from typing import List, Optional, Tuple, NoReturn
+from typing import List, Optional, Tuple
 from tensorflow.keras.utils import Sequence
 
-from src.scripts.data_preprocessing import data_balancing
 from src.scripts.augmenter import Augmentation, apply_augmentations
 from src.scripts.data_preprocessing import mfcc_extractor
 
@@ -57,8 +55,8 @@ class BatchGenerator(Sequence):
         label_batch = self.labels[batch_indices]
         label_batch_tensor = tf.convert_to_tensor(label_batch, dtype=tf.int64)
 
-        if self.balance:
-            feature_batch, label_batch = data_balancing(feature_batch, label_batch)
+        # if self.balance:
+        #     feature_batch, label_batch = data_balancing(feature_batch, label_batch)
         if self.augmentations:
             feature_batch = apply_augmentations(feature_batch, self.augmentations)
 
@@ -74,25 +72,3 @@ class BatchGenerator(Sequence):
         :return: Number of batches.
         """
         return int(math.ceil(self.features.shape[0] / self.batch_size))
-
-    # def on_epoch_end(self) -> NoReturn:
-    #     """
-    #     Method that is called once training has finished an epoch. The only thing we need to do in
-    #     those situations is shuffling the indices if that's been enabled in the constructor.
-    #
-    #     :return: No return.
-    #     """
-    #     super().on_epoch_end()
-    #     self._shuffle_indices(self.shuffle)
-    #
-    # def _shuffle_indices(self, shuffle) -> NoReturn:
-    #     """
-    #     Shuffle indices if shuffle is True. Shuffle has been added as an explicit parameter instead
-    #     of just using self.shuffle to provide more intuition from callsites that shuffling is
-    #     optional.
-    #
-    #     :param shuffle: Whether or not data should be shuffled.
-    #     :return: No return. Data is shuffled inplace.
-    #     """
-    #     if shuffle:
-    #         random.shuffle(self.indices)

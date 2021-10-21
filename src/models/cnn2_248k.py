@@ -149,7 +149,7 @@ class Cnn2Param248k(NnModel):
         :return: Compiled Keras model
         """
 
-        adam = Adam(lr=learning_rate, beta_1=beta1, beta_2=beta2, epsilon=epsilon)
+        adam = Adam(learning_rate=learning_rate, beta_1=beta1, beta_2=beta2, epsilon=epsilon)
         self.model_out.compile(
             loss="sparse_categorical_crossentropy",
             optimizer=adam,

@@ -14,7 +14,7 @@ def create_dataset_generator(
     train: bool,
     augmentations: Union[List[Augmentation], None],
     cache_save_path: Path,
-    batch_size: int = 12,
+    batch_size: int = 32,
 ) -> tf.data.Dataset:
     """
     Function to create tensorflow dataset from batch generator
@@ -36,10 +36,12 @@ def create_dataset_generator(
         balance = False
 
     data_gen = BatchGenerator(datax, datay, augmentations=augmentations, balance=balance)
-    mfcc_dataset = tf.data.Dataset.from_generator(lambda: map(tuple, data_gen))
+    mfcc_dataset = tf.data.Dataset.from_generator(
+        lambda: map(tuple, data_gen), output_types=(tf.float64, tf.int64)
+    )
     mfcc_dataset.cache(filename=str(cache_save_path))
     if train:
-        mfcc_dataset.shuffle(buffer_size=tf.data.AUTOTUNE)
+        mfcc_dataset.shuffle(buffer_size=len(datax))
     mfcc_dataset.batch(batch_size, num_parallel_calls=tf.data.AUTOTUNE)
     mfcc_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
 
