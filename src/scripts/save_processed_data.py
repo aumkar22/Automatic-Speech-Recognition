@@ -1,5 +1,3 @@
-from typing import NoReturn
-
 from src.scripts.data_load import *
 from src.scripts.data_preprocessing import *
 from src.util.definitions import *
