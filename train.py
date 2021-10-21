@@ -11,6 +11,7 @@ from src.util.definitions import *
 from src.scripts.save_processed_data import save_data
 from src.models.eval import EvalVisualize
 from src.scripts.dataset_creation import create_dataset_generator
+from src.util.folder_check import folder_delete
 
 
 def train(
@@ -123,6 +124,9 @@ if __name__ == "__main__":
     preprocess = args.preprocess
 
     if preprocess == "False":
+        # Delete folder and it's contents if it already exists, before creating and saving
+        # preprocessed data at that path
+        folder_delete(FEATURES_PATH)
         save_data(FEATURES_PATH)
 
     xtrain = np.load(str(FEATURES_PATH / "train.npy"))
