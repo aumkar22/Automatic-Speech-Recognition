@@ -14,7 +14,7 @@ class BatchGenerator(Sequence):
         self,
         features: np.ndarray,
         labels: np.ndarray,
-        batch_size: int = 12,
+        batch_size: int = 32,
         augmentations: Optional[List[Augmentation]] = None,
     ):
         """
