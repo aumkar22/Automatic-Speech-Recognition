@@ -16,7 +16,6 @@ class BatchGenerator(Sequence):
         labels: np.ndarray,
         batch_size: int = 12,
         augmentations: Optional[List[Augmentation]] = None,
-        balance: bool = True,
     ):
         """
         Batch generator based on Keras's Sequence class. This generates batches of size batch_size
@@ -27,7 +26,6 @@ class BatchGenerator(Sequence):
         :param batch_size: Size of batches.
         :param augmentations: Optional list of augmentations to be applied on a per-experiment
                               basis.
-        :param balance: Balance training data batch.
         """
         self.features = features
         self.labels = labels
@@ -36,7 +34,6 @@ class BatchGenerator(Sequence):
         # Create indices for all experiments that will be used to select features/labels in
         # batches.
         self.indices = list(range(features.shape[0]))
-        self.balance = balance
 
     def __getitem__(self, index: int) -> Tuple[tf.Tensor, tf.Tensor]:
         """

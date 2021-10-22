@@ -5,7 +5,6 @@ from typing import Optional, List
 
 from src.scripts.augmenter import Augmentation
 from src.scripts.generator import BatchGenerator
-from src.util.folder_check import *
 
 
 def create_dataset_generator(
@@ -26,12 +25,7 @@ def create_dataset_generator(
     :return: Tensorflow dataset
     """
 
-    if train:
-        balance = True
-    else:
-        balance = False
-
-    data_gen = BatchGenerator(datax, datay, augmentations=augmentations, balance=balance)
+    data_gen = BatchGenerator(datax, datay, augmentations=augmentations)
     mfcc_dataset = tf.data.Dataset.from_generator(
         lambda: map(tuple, data_gen), output_types=(tf.float64, tf.int64)
     )
