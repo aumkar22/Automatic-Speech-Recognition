@@ -9,4 +9,4 @@ default:
   strides2: [1, 2]
   pool_size2: 2
   pool_stride2: 1
-  Nfc: 60
+  Nfc: 120
