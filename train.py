@@ -33,18 +33,9 @@ def train(
     :param model_name: Name of the model to train
     """
 
-    cache_path_train = Path(CACHE_PATH / f"train_{model_name}")
-    cache_path_val = Path(CACHE_PATH / f"val_{model_name}")
-    cache_path_test = Path(CACHE_PATH / f"test_{model_name}")
-    train_generator = create_dataset_generator(
-        train_data[0], train_data[1], True, augmentations, cache_path_train
-    )
-    validation_generator = create_dataset_generator(
-        val_data[0], val_data[1], False, None, cache_path_val
-    )
-    test_generator = create_dataset_generator(
-        test_data[0], test_data[1], False, None, cache_path_test
-    )
+    train_generator = create_dataset_generator(train_data[0], train_data[1], True, augmentations)
+    validation_generator = create_dataset_generator(val_data[0], val_data[1], False, None)
+    test_generator = create_dataset_generator(test_data[0], test_data[1], False, None)
     for train_data, train_labels in train_generator.take(1):
         print("Train data shape: ", train_data.shape)
         print("Train label shape: ", train_labels.shape)
@@ -62,14 +53,13 @@ def train(
     compiled_model.fit(
         train_generator, validation_data=validation_generator, epochs=500, callbacks=callbacks,
     )
-
     print("Predicting on test set")
     test_predict = compiled_model.predict(test_generator, use_multiprocessing=True, workers=6)
     predictions = np.argmax(test_predict, 1)
 
     evaluation_visualization = EvalVisualize(test_data[1], predictions)
     evaluation_visualization.get_metrics(
-        Path(METRICS_PATH / f"metrics_{model_name}.pkl"), print_report=True
+        Path(METRICS_PATH / f"metrics_{model_name}.csv"), print_report=True
     )
     evaluation_visualization.get_confusion_matrix(
         Path(PLOTS_PATH / f"plot_{model_name}.png"), plot_matrix=True

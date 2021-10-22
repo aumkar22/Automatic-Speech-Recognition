@@ -1,6 +1,6 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-import pickle
 import seaborn as sns
 
 from sklearn.metrics import (
@@ -40,13 +40,15 @@ class EvalVisualize(object):
         :return: No return.
         """
 
-        result = classification_report(self.ytrue, self.ypred, target_names=classes)
-
+        result = classification_report(
+            self.ytrue, self.ypred, target_names=classes, digits=2, output_dict=True
+        )
+        report_df = pd.DataFrame.from_dict(result, orient="columns").dropna().round(2).T
         if print_report:
-            print(result)
+            print(report_df)
 
-        path_check(save_path, True)
-        pickle.dump(result, save_path.open("wb"))
+        path_check(save_path.parent, True)
+        report_df.to_csv(str(save_path), index=False)
 
     def get_confusion_matrix(self, save_path: Path, plot_matrix: bool = False) -> NoReturn:
 
@@ -59,16 +61,23 @@ class EvalVisualize(object):
         """
 
         cm = confusion_matrix(self.ytrue, self.ypred)
-        normalized_cm = np.expand_dims((cm.astype("float") / cm.sum(axis=1)), axis=1)
+        normalized_cm = cm.astype("float") / cm.sum(axis=1)
 
-        path_check(save_path, True)
+        path_check(save_path.parent, True)
 
-        plt.figure(figsize=(25, 25))
-        sns.heatmap(normalized_cm, annot=True, xticklabels=classes, yticklabels=classes, fmt="g")
+        plt.figure(figsize=(50, 50))
+        sns.set(font_scale=1.4)
+        sns.heatmap(
+            np.round(normalized_cm, 2),
+            annot=True,
+            xticklabels=classes,
+            yticklabels=classes,
+            fmt="g",
+        )
         plt.title("Normalized confusion matrix")
         plt.ylabel("True label", fontsize=30)
         plt.xlabel("Predicted label", fontsize=30)
-        plt.savefig(save_path, dpi=400)
+        plt.savefig(save_path, dpi=250)
 
         if plot_matrix:
             plt.show()
