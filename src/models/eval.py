@@ -44,9 +44,13 @@ class EvalVisualize(object):
             self.ytrue, self.ypred, target_names=classes, digits=2, output_dict=True
         )
         report_df = pd.DataFrame.from_dict(result, orient="columns").dropna().round(2).T
+
         if print_report:
             print(report_df)
 
+        report_df.insert(
+            loc=0, column="class", value=classes + ["accuracy", "macro avg", "weighted " "avg"]
+        )
         path_check(save_path.parent, True)
         report_df.to_csv(str(save_path), index=False)
 
