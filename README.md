@@ -15,7 +15,7 @@ To train a model, if you do not have preprocessed data, you can run this code fr
 python train.py --model=resnet_334k --preprocess=False
 ```
 
-If you already have preprocessed data, set ```--preprocess=True```. If ```model``` parameter is not mentioned, default would be used.
+If you already have preprocessed data, set ```--preprocess=True```. If parameters are not mentioned, default would be used.
 
 ## Data Set
 Google Speech Commands data set v0.02 was used for the project. Data can be downloaded from here: http://download.tensorflow.org/data/speech_commands_v0.02.tar.gz
