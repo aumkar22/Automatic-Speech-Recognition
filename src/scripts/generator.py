@@ -19,10 +19,10 @@ class BatchGenerator(Sequence):
     ):
         """
         Batch generator based on Keras's Sequence class. This generates batches of size batch_size
-        for both features as well as labels. Data can optionally be augmented and shuffled.
+        for both features as well as labels. Data can optionally be augmented.
 
-        :param features: Feature data with shape (experiments, samples, channels).
-        :param labels: Label data with shape (experiments).
+        :param features: Feature data.
+        :param labels: Label data.
         :param batch_size: Size of batches.
         :param augmentations: Optional list of augmentations to be applied on a per-experiment
                               basis.
@@ -40,8 +40,7 @@ class BatchGenerator(Sequence):
         Create, possibly augment, and return a batch of feature and label data.
 
         :param index: Index of the batch.
-        :return: A tuple consisting of a batch of feature data and one of label data. The None List
-                 is added to suppress a warning.
+        :return: A tuple consisting of a batch of feature data and one of label data.
         """
         # Index can be interpreted as the batch number.
         start_index = index * self.batch_size
