@@ -1,8 +1,7 @@
-from typing import NoReturn
-
 from src.scripts.data_load import *
 from src.scripts.data_preprocessing import *
 from src.util.definitions import *
+from src.util.folder_check import *
 
 
 def apply_preprocess(
@@ -74,8 +73,7 @@ def save_data(save_path: Path) -> NoReturn:
         test_data, test_labels_list_after_excluded_indices, data_scaler, False
     )
 
-    if not save_path.exists():
-        save_path.mkdir(exist_ok=True, parents=True)
+    path_check(save_path, True)
 
     np.save(str(save_path / "train.npy"), preprocessed_train_data)
     np.save(str(save_path / "val.npy"), preprocessed_val_data)

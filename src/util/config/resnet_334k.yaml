@@ -11,5 +11,5 @@ default:
   dilation_rate4: 16
   Nfc1: 520
   Nfc2: 120
-  dropout1: 0.5
-  dropout2: 0.5
+  dropout1: 0.3
+  dropout2: 0.3

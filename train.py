@@ -1,15 +1,17 @@
 import yaml
 import argparse
 import importlib, inspect
+import tensorflow as tf
 
-from typing import Optional, Tuple
+from typing import Tuple, NoReturn
 
 from src.models.nn_models import NnModel
 from src.scripts.augmenter import *
-from src.scripts.generator import BatchGenerator
 from src.util.definitions import *
 from src.scripts.save_processed_data import save_data
 from src.models.eval import EvalVisualize
+from src.scripts.dataset_creation import create_dataset_generator
+from src.util.folder_check import folder_delete
 
 
 def train(
@@ -17,44 +19,47 @@ def train(
     train_data: Tuple[np.ndarray, ...],
     val_data: Tuple[np.ndarray, ...],
     test_data: Tuple[np.ndarray, ...],
-    augmentations: Optional[List[Augmentation]],
+    augmentations: List[Augmentation],
     model_name: str,
-):
+) -> NoReturn:
+    """
+    Function to train the model
 
-    train_generator = BatchGenerator(
-        train_data[0], train_data[1], augmentations=augmentations, train=True
-    )
-    validation_generator = BatchGenerator(
-        val_data[0], val_data[1], augmentations=None, train=False
-    )
-    test_generator = BatchGenerator(test_data[0], test_data[1], augmentations=None, train=False)
+    :param model: Model to train
+    :param train_data: Train data
+    :param val_data: Validation data
+    :param test_data: Test data
+    :param augmentations: List of augmentations for training
+    :param model_name: Name of the model to train
+    """
 
-    model_architecture = model.model_architecture()
-    compiled_model = model_architecture.model_compile()
+    train_generator = create_dataset_generator(train_data[0], train_data[1], True, augmentations)
+    validation_generator = create_dataset_generator(val_data[0], val_data[1], False, None)
+    test_generator = create_dataset_generator(test_data[0], test_data[1], False, None)
+    for train_data, train_labels in train_generator.take(1):
+        print("Train data shape: ", train_data.shape)
+        print("Train label shape: ", train_labels.shape)
+
+    model.model_architecture()
+    compiled_model = model.model_compile()
+
     print(compiled_model.summary())
-    callbacks = model_architecture.model_callbacks(
+
+    callbacks = model.model_callbacks(
         Path(MODEL_PATH / f"{model_name}"), Path(TENSORBOARD_PATH / f"{model_name}")
     )
-
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices("GPU")))
     print("Training...")
-    compiled_model.fit_generator(
-        train_generator,
-        validation_generator=validation_generator,
-        epochs=500,
-        callbacks=callbacks,
-        use_multiprocessing=True,
-        workers=6,
+    compiled_model.fit(
+        train_generator, validation_data=validation_generator, epochs=500, callbacks=callbacks,
     )
-
     print("Predicting on test set")
-    test_predict = compiled_model.predict_generator(
-        test_generator, use_multiprocessing=True, workers=6
-    )
+    test_predict = compiled_model.predict(test_generator, use_multiprocessing=True, workers=6)
     predictions = np.argmax(test_predict, 1)
 
     evaluation_visualization = EvalVisualize(test_data[1], predictions)
     evaluation_visualization.get_metrics(
-        Path(METRICS_PATH / f"metrics_{model_name}.pkl"), print_report=True
+        Path(METRICS_PATH / f"metrics_{model_name}.csv"), print_report=True
     )
     evaluation_visualization.get_confusion_matrix(
         Path(PLOTS_PATH / f"plot_{model_name}.png"), plot_matrix=True
@@ -81,7 +86,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-p",
         "--preprocess",
-        help="Boolean option to select of data is " "preprocessed",
+        help="Boolean option to select if data is preprocessed",
         choices=["False", "True"],
         default="False",
     )
@@ -107,6 +112,9 @@ if __name__ == "__main__":
     preprocess = args.preprocess
 
     if preprocess == "False":
+        # Delete folder and it's contents if it already exists, before creating and saving
+        # preprocessed data at that path
+        folder_delete(FEATURES_PATH)
         save_data(FEATURES_PATH)
 
     xtrain = np.load(str(FEATURES_PATH / "train.npy"))

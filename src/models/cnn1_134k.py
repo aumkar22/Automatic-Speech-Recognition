@@ -13,7 +13,6 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 
 from src.models.nn_models import NnModel
-from src.models.mfcc_layer import Mfcc
 
 
 class Cnn1Param134k(NnModel):
@@ -62,10 +61,9 @@ class Cnn1Param134k(NnModel):
         self.Nfc1 = Nfc1
         self.Nfc2 = Nfc2
         super().__init__()
-        self.input_shape = (self.features,)
         self.model_out = None
 
-    def model_architecture(self) -> tf.Model:
+    def model_architecture(self):
 
         """
 
@@ -74,11 +72,9 @@ class Cnn1Param134k(NnModel):
 
         model_input = Input(shape=self.input_shape)
 
-        model = Mfcc(trainable=False)(model_input)
-
         model = Conv2D(
             self.N1, kernel_size=self.kernel_size1, strides=self.strides1, activation="relu"
-        )(model)
+        )(model_input)
 
         model = BatchNormalization(axis=-1, scale=None)(model)
 
@@ -120,7 +116,7 @@ class Cnn1Param134k(NnModel):
         :return: Compiled Keras model
         """
 
-        adam = Adam(lr=learning_rate, beta_1=beta1, beta_2=beta2, epsilon=epsilon)
+        adam = Adam(learning_rate=learning_rate, beta_1=beta1, beta_2=beta2, epsilon=epsilon)
         self.model_out.compile(
             loss="sparse_categorical_crossentropy",
             optimizer=adam,
