@@ -52,8 +52,6 @@ class BatchGenerator(Sequence):
         label_batch = self.labels[batch_indices]
         label_batch_tensor = tf.convert_to_tensor(label_batch, dtype=tf.int64)
 
-        # if self.balance:
-        #     feature_batch, label_batch = data_balancing(feature_batch, label_batch)
         if self.augmentations:
             feature_batch = apply_augmentations(feature_batch, self.augmentations)
 

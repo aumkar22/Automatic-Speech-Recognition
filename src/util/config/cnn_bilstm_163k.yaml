@@ -11,5 +11,5 @@ default:
   pool_stride2: 1
   units: 32
   Nfc1: 60
-  dropout1: 0.2
-  dropout2: 0.2
+  dropout1: 0.1
+  dropout2: 0.1

@@ -1,7 +1,6 @@
 import numpy as np
 
-from typing import Tuple, List
-from imblearn.over_sampling import RandomOverSampler
+from typing import List
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from python_speech_features import mfcc
 
@@ -57,25 +56,6 @@ def apply_standardize(data: np.ndarray, scaler: StandardScaler) -> np.ndarray:
     standardized_data = scaler.transform(data)
 
     return standardized_data
-
-
-def data_balancing(
-    train_data: np.ndarray, train_labels: np.ndarray, seed: int = 42
-) -> Tuple[np.ndarray, np.ndarray]:
-
-    """
-    Balancing the training data by over sampling every class except the majority class
-
-    :param train_data: Training data
-    :param train_labels: Training data labels
-    :param seed: Seed for reproducibility
-    :return: Balanced training data and corresponding labels
-    """
-
-    resampler = RandomOverSampler(random_state=seed)
-    train_data_resampled, train_labels_resampled = resampler.fit_resample(train_data, train_labels)
-
-    return train_data_resampled, train_labels_resampled
 
 
 def data_encode(label: List[str]) -> np.ndarray:
